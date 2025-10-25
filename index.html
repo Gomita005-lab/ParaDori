@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ti ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #764ba2;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .heart {
+            font-size: 3rem;
+            color: #e74c3c;
+            margin: 1rem 0;
+            display: inline-block;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .message {
+            color: #333;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin: 2rem 0;
+        }
+
+        .date {
+            color: #666;
+            font-style: italic;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .flowers {
+            font-size: 2rem;
+            margin: 1rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .flower {
+            display: inline-block;
+            animation: sway 2s ease-in-out infinite;
+        }
+
+        .flower:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .flower:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes sway {
+            0%, 100% {
+                transform: rotate(-5deg);
+            }
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(118, 75, 162, 0.4);
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <h1>Para la Persona Más Especial</h1>
+        
+        <div class="heart">❤️</div>
+        
+        <div class="flowers">
+            <span class="flower">🌹</span>
+            <span class="flower">🌹</span>
+            <span class="flower">🌹</span>
+        </div>
+        
+        <div class="message">
+            <p>Cada día a tu lado es un regalo.</p>
+            <p>Tu sonrisa ilumina mis días y tu amor llena mi corazón.</p>
+            <p>Gracias por ser parte de mi vida y por todos los momentos que compartimos juntos.</p>
+        </div>
+        
+        <button class="button" onclick="mostrarMensaje()">Haz clic aquí 💕</button>
+        
+        <div class="date">
+            Con todo mi amor ❤️
+        </div>
+    </div>
+
+    <script>
+        // Crear estrellas
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Función para mostrar mensaje
+        function mostrarMensaje() {
+            alert('¡Eres increíble! 💖✨');
+        }
+    </script>
+</body>
+</html>
