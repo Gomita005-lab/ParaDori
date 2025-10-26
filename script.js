@@ -103,23 +103,25 @@ function toggleMusic() {
         musicPlaying = true;
     }
 }
+// Sistema de mensajes compartidos
+// script.js
 
-// ✅ Importar módulos de Firebase
+// Importar las librerías necesarias desde Firebase CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-// 🔑 Configuración de Firebase
+// 🔑 Configura con tus credenciales
 const firebaseConfig = {
   apiKey: "AIzaSyDNwIE4X9No1XNSdYetWHDeUJCkX5VT5Rs",
   authDomain: "para-dori-3dcd9.firebaseapp.com",
   databaseURL: "https://para-dori-3dcd9-default-rtdb.firebaseio.com",
   projectId: "para-dori-3dcd9",
-  storageBucket: "para-dori-3dcd9.appspot.com", // ✅ corregido
+  storageBucket: "para-dori-3dcd9.firebasestorage.app",
   messagingSenderId: "790705295029",
   appId: "1:790705295029:web:a4accf0735640deca6b8fc"
 };
 
-// 🚀 Inicializar Firebase
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const mensajesRef = ref(db, "mensajes");
@@ -179,53 +181,46 @@ function submitMessage() {
     date: timestamp
   };
 
-  // 🩵 Guardar mensaje en Firebase
-  push(mensajesRef, newMessage)
-    .then(() => {
-      closeFormModal();
-    })
-    .catch((error) => {
-      console.error("Error al guardar el mensaje:", error);
-      alert("Error al guardar el mensaje. Intenta de nuevo.");
-    });
+  // Guardar mensaje en Firebase
+  push(mensajesRef, newMessage);
+  closeFormModal();
 }
 
 // 💬 Cargar mensajes
 function loadMessages() {
   const wall = document.getElementById("messagesWall");
 
-  onValue(
-    mensajesRef,
-    (snapshot) => {
-      const data = snapshot.val();
+  onValue(mensajesRef, (snapshot) => {
+    const data = snapshot.val();
 
-      if (!data) {
-        wall.innerHTML =
-          '<p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>';
-        return;
-      }
-
-      const messages = Object.values(data).sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-
-      wall.innerHTML = messages
-        .map(
-          (msg) => `
-        <div class="message-card">
-          <div class="message-author ${msg.author.toLowerCase()}">${msg.author} 💕</div>
-          <div class="message-text">${msg.text}</div>
-          <div class="message-date">${msg.date}</div>
-        </div>
-      `
-        )
-        .join("");
-    },
-    (error) => {
-      console.error("Error loading messages:", error);
+    if (!data) {
+      wall.innerHTML = '<p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>';
+      return;
     }
-  );
+
+    const messages = Object.values(data).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    wall.innerHTML = messages.map(msg => `
+      <div class="message-card">
+        <div class="message-author ${msg.author.toLowerCase()}">${msg.author} 💕</div>
+        <div class="message-text">${msg.text}</div>
+        <div class="message-date">${msg.date}</div>
+      </div>
+    `).join('');
+  }, (error) => {
+    console.error("Error loading messages:", error);
+  });
 }
 
 // 🪄 Iniciar cuando cargue la página
 document.addEventListener("DOMContentLoaded", loadMessages);
+// 🔓 Hacer funciones accesibles desde HTML
+window.openMessageForm = openMessageForm;
+window.closeFormModal = closeFormModal;
+window.selectPerson = selectPerson;
+window.backToPersonSelect = backToPersonSelect;
+window.submitMessage = submitMessage;
+window.showMessage = showMessage;
+window.closeModal = closeModal;
+window.createConfetti = createConfetti;
+window.toggleMusic = toggleMusic;
