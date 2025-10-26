@@ -103,120 +103,129 @@ function toggleMusic() {
         musicPlaying = true;
     }
 }
-// Sistema de mensajes compartidos
-let currentPerson = '';
 
+// ✅ Importar módulos de Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+// 🔑 Configuración de Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDNwIE4X9No1XNSdYetWHDeUJCkX5VT5Rs",
+  authDomain: "para-dori-3dcd9.firebaseapp.com",
+  databaseURL: "https://para-dori-3dcd9-default-rtdb.firebaseio.com",
+  projectId: "para-dori-3dcd9",
+  storageBucket: "para-dori-3dcd9.appspot.com", // ✅ corregido
+  messagingSenderId: "790705295029",
+  appId: "1:790705295029:web:a4accf0735640deca6b8fc"
+};
+
+// 🚀 Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const mensajesRef = ref(db, "mensajes");
+
+// 💌 VARIABLES GLOBALES
+let currentPerson = "";
+
+// 🧸 Abrir formulario
 function openMessageForm() {
-    document.getElementById('formModal').style.display = 'flex';
-    document.getElementById('personSelectStep').style.display = 'block';
-    document.getElementById('messageWriteStep').style.display = 'none';
+  document.getElementById("formModal").style.display = "flex";
+  document.getElementById("personSelectStep").style.display = "block";
+  document.getElementById("messageWriteStep").style.display = "none";
 }
 
+// ❌ Cerrar modal
 function closeFormModal() {
-    document.getElementById('formModal').style.display = 'none';
-    document.getElementById('messageInput').value = '';
-    currentPerson = '';
+  document.getElementById("formModal").style.display = "none";
+  document.getElementById("messageInput").value = "";
+  currentPerson = "";
 }
 
+// 🐻 Seleccionar persona
 function selectPerson(person) {
-    currentPerson = person;
-    document.getElementById('personSelectStep').style.display = 'none';
-    document.getElementById('messageWriteStep').style.display = 'block';
-    document.getElementById('writerName').textContent = `Escribe como ${person} 💕`;
+  currentPerson = person;
+  document.getElementById("personSelectStep").style.display = "none";
+  document.getElementById("messageWriteStep").style.display = "block";
+  document.getElementById("writerName").textContent = `Escribe como ${person} 💕`;
 }
 
+// 🔙 Volver atrás
 function backToPersonSelect() {
-    document.getElementById('personSelectStep').style.display = 'block';
-    document.getElementById('messageWriteStep').style.display = 'none';
-    document.getElementById('messageInput').value = '';
+  document.getElementById("personSelectStep").style.display = "block";
+  document.getElementById("messageWriteStep").style.display = "none";
+  document.getElementById("messageInput").value = "";
 }
 
-async function submitMessage() {
-    const messageText = document.getElementById('messageInput').value.trim();
-    
-    if (!messageText) {
-        alert('Por favor escribe un mensaje 💕');
-        return;
-    }
+// ✉️ Enviar mensaje
+function submitMessage() {
+  const messageText = document.getElementById("messageInput").value.trim();
 
-    const timestamp = new Date().toLocaleString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+  if (!messageText) {
+    alert("Por favor escribe un mensaje 💕");
+    return;
+  }
+
+  const timestamp = new Date().toLocaleString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  const newMessage = {
+    author: currentPerson,
+    text: messageText,
+    date: timestamp
+  };
+
+  // 🩵 Guardar mensaje en Firebase
+  push(mensajesRef, newMessage)
+    .then(() => {
+      closeFormModal();
+    })
+    .catch((error) => {
+      console.error("Error al guardar el mensaje:", error);
+      alert("Error al guardar el mensaje. Intenta de nuevo.");
     });
-
-    const messageData = {
-        author: currentPerson,
-        text: messageText,
-        date: timestamp
-    };
-
-    // Guardar mensaje
-    try {
-        const messageId = `msg_${Date.now()}`;
-        await window.storage.set(messageId, JSON.stringify(messageData), true);
-        
-        closeFormModal();
-        loadMessages();
-        
-        showMessage(8); // Mensaje de éxito
-    } catch (error) {
-        alert('Error al guardar el mensaje. Intenta de nuevo.');
-    }
 }
 
-async function loadMessages() {
-    const wall = document.getElementById('messagesWall');
-    
-    try {
-        const result = await window.storage.list('msg_', true);
-        
-        if (!result || !result.keys || result.keys.length === 0) {
-            wall.innerHTML = '<p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>';
-            return;
-        }
+// 💬 Cargar mensajes
+function loadMessages() {
+  const wall = document.getElementById("messagesWall");
 
-        // Obtener todos los mensajes
-        const messages = [];
-        for (const key of result.keys) {
-            try {
-                const data = await window.storage.get(key, true);
-                if (data && data.value) {
-                    const msgData = JSON.parse(data.value);
-                    msgData.id = key;
-                    messages.push(msgData);
-                }
-            } catch (e) {
-                console.error('Error loading message:', e);
-            }
-        }
+  onValue(
+    mensajesRef,
+    (snapshot) => {
+      const data = snapshot.val();
 
-        // Ordenar por fecha (más recientes primero)
-        messages.sort((a, b) => {
-            const timeA = a.id.split('_')[1];
-            const timeB = b.id.split('_')[1];
-            return timeB - timeA;
-        });
+      if (!data) {
+        wall.innerHTML =
+          '<p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>';
+        return;
+      }
 
-        // Mostrar mensajes
-        wall.innerHTML = messages.map(msg => `
-            <div class="message-card">
-                <div class="message-author ${msg.author.toLowerCase()}">${msg.author} 💕</div>
-                <div class="message-text">${msg.text}</div>
-                <div class="message-date">${msg.date}</div>
-            </div>
-        `).join('');
+      const messages = Object.values(data).sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
 
-    } catch (error) {
-        console.error('Error loading messages:', error);
-        wall.innerHTML = '<p style="color: #999;">Error al cargar mensajes.</p>';
+      wall.innerHTML = messages
+        .map(
+          (msg) => `
+        <div class="message-card">
+          <div class="message-author ${msg.author.toLowerCase()}">${msg.author} 💕</div>
+          <div class="message-text">${msg.text}</div>
+          <div class="message-date">${msg.date}</div>
+        </div>
+      `
+        )
+        .join("");
+    },
+    (error) => {
+      console.error("Error loading messages:", error);
     }
+  );
 }
 
-// Cargar mensajes al iniciar
-loadMessages();
-
-// Recargar mensajes cada 10 segundos
-setInterval(loadMessages, 10000);
+// 🪄 Iniciar cuando cargue la página
+document.addEventListener("DOMContentLoaded", loadMessages);
