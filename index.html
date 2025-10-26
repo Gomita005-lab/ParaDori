@@ -1,222 +1,128 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Ti ❤️</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para mi Dori ❤️</title>
 
-        body {
-            font-family: 'Georgia', serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 3rem;
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
-            animation: fadeIn 1s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h1 {
-            color: #764ba2;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            animation: heartbeat 1.5s infinite;
-        }
-
-        @keyframes heartbeat {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .heart {
-            font-size: 3rem;
-            color: #e74c3c;
-            margin: 1rem 0;
-            display: inline-block;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.2);
-            }
-        }
-
-        .message {
-            color: #333;
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin: 2rem 0;
-        }
-
-        .date {
-            color: #666;
-            font-style: italic;
-            margin-top: 2rem;
-            font-size: 0.9rem;
-        }
-
-        .flowers {
-            font-size: 2rem;
-            margin: 1rem 0;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .flower {
-            display: inline-block;
-            animation: sway 2s ease-in-out infinite;
-        }
-
-        .flower:nth-child(2) {
-            animation-delay: 0.3s;
-        }
-
-        .flower:nth-child(3) {
-            animation-delay: 0.6s;
-        }
-
-        @keyframes sway {
-            0%, 100% {
-                transform: rotate(-5deg);
-            }
-            50% {
-                transform: rotate(5deg);
-            }
-        }
-
-        .button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(118, 75, 162, 0.4);
-        }
-
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite;
-        }
-
-        @keyframes twinkle {
-            0%, 100% {
-                opacity: 0.3;
-            }
-            50% {
-                opacity: 1;
-            }
-        }
-
-        .container {
-            position: relative;
-            z-index: 2;
-        }
-    </style>
+  <!-- 🔗 Vincular tu hoja de estilos -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="stars" id="stars"></div>
-    
-    <div class="container">
-        <h1>Para mi Dori</h1>
-        
-        <div class="heart">
-    <img src="Juntitos.jpg" width="200" height="200">
+  <div class="stars" id="stars"></div>
+  <div class="floating-hearts" id="floatingHearts"></div>
+  <audio id="bgMusic" loop>
+    <source src="Amor_del_bueno_Lyrics.mp3" type="audio/mpeg">
+</audio>
+  <div class="music-control" onclick="toggleMusic()" id="musicBtn">🎵</div>
+<div class="modal" id="messageModal">
+    <div class="modal-content">
+        <div class="modal-heart">💖</div>
+        <div class="modal-text" id="modalText"></div>
+        <button class="modal-close" onclick="closeModal()">Aceptar 💕</button>
+    </div>
 </div>
 
-        
-        <div class="flowers">
-            <span class="flower">🌹</span>
-            <span class="flower">🌹</span>
-            <span class="flower">🌹</span>
+<div class="modal form-modal" id="formModal">
+    <div class="modal-content">
+        <div id="personSelectStep">
+            <h2 class="modal-title">¿Quién eres? 💕</h2>
+            <div class="person-select">
+                <button class="person-btn" onclick="selectPerson('Gomita')">Gomita 🐻</button>
+                <button class="person-btn" onclick="selectPerson('Dori')">Dori 🐰</button>
+            </div>
+            <button class="modal-close" onclick="closeFormModal()">Cancelar</button>
         </div>
         
-        <div class="message">
-            <p>Bueno, utilizare este medio para al menos transmitir algo contigo.</p>
-            <p>Ahora es simple nomas :'v , como forma de prueba.</p>
-            <p>Igual aprovecho decirte que te quiero mucho :c .</p>
-        </div>
-        
-        <button class="button" onclick="mostrarMensaje()"> Me tocas? :c 💕</button>
-        
-        <div class="date">
-            Besitos :c 
+        <div id="messageWriteStep" style="display: none;">
+            <h2 class="modal-title" id="writerName"></h2>
+            <p class="modal-subtitle">Escribe tu mensaje de amor 💌</p>
+            <textarea class="message-input" id="messageInput" placeholder="Escribe aquí tu mensaje..."></textarea>
+            <div>
+                <button class="back-btn" onclick="backToPersonSelect()">Atrás</button>
+                <button class="submit-btn" onclick="submitMessage()">Enviar 💕</button>
+            </div>
         </div>
     </div>
+</div>
+  <div class="container">
+      <h1>Para mi Dori</h1>
+      
+      <div class="heart">
+        <img src="Juntitos.jpg" width="200" height="200">
+      </div>
+      
+      <div class="flowers">
+          <span class="flower">🌹</span>
+          <span class="flower">🌹</span>
+          <span class="flower">🌹</span>
+      </div>
+      
+      <div class="message">
+<p>Te pienso en cada amanecer y en cada silencio del día.</p>
+<p>Eres mi paz en los días difíciles y mi sonrisa en los días buenos.</p>
+<p>No hay canción ni palabra que pueda decirte cuánto te quiero. 💕</p>
 
-    <script>
-        // Crear estrellas
-        const starsContainer = document.getElementById('stars');
-        for (let i = 0; i < 50; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.width = Math.random() * 3 + 'px';
-            star.style.height = star.style.width;
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.animationDelay = Math.random() * 3 + 's';
-            starsContainer.appendChild(star);
-        }
+      </div>
 
-        // Función para mostrar mensaje
-        function mostrarMensaje() {
-            alert('¡Te quiero 7 trillones! 💖✨');
-        }
-    </script>
+      <div class="counter">
+          <h2>Llevamos juntos</h2>
+          <div class="counter-number" id="dayCounter">0</div>
+          <p>días creando momentos inolvidables ❤️</p>
+      </div>
+
+      <div class="quote" id="randomQuote">
+          "El amor no se mira, se siente, y aún más cuando ella está junto a ti"
+      </div>
+
+      <h2>Mensajes Secretos 💌</h2>
+      <div class="buttons-grid">
+          <button class="button" onclick="showMessage(1)">¿Cuánto te quiero?</button>
+          <button class="button" onclick="showMessage(2)">Mi día favorito</button>
+          <button class="button" onclick="showMessage(3)">Lo que admiro</button>
+          <button class="button" onclick="showMessage(4)">Nuestra canción</button>
+          <button class="button" onclick="showMessage(5)">Deseo especial</button>
+          <button class="button" onclick="createConfetti()">¡Sorpresa! 🎉</button>
+      </div>
+
+      <h2>Razones por las que te quiero 💖</h2>
+      <div class="reasons-list">
+          <div class="reason-item">💕 Tu sonrisa ilumina hasta mis días más oscuros</div>
+          <div class="reason-item">✨ Haces que todo sea más especial</div>
+          <div class="reason-item">🌟 Me haces sentir único e importante</div>
+          <div class="reason-item">💝 Cada momento contigo es un regalo</div>
+          <div class="reason-item">🎈 Tu forma de ser me enamora cada día más</div>
+      </div>
+
+<h2>Nuestra Galería 📸</h2>
+<div class="gallery">
+    <div class="gallery-item">💑</div>
+    <div class="gallery-item">🎂</div>
+    <div class="gallery-item">🌅</div>
+    <div class="gallery-item">🎭</div>
+    <div class="gallery-item">🍕</div>
+    <div class="gallery-item">🎮</div>
+</div>
+
+<h2>Nuestro Muro de Amor 💌</h2>
+<button class="button" onclick="openMessageForm()" style="font-size: 1.2rem; margin-bottom: 2rem;">
+    ✍️ Escribir un mensaje
+</button>
+
+<div class="messages-wall" id="messagesWall">
+    <p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>
+</div>
+
+<button class="button" onclick="showMessage(6)" style="margin-top: 2rem; font-size: 1.2rem;">
+    Me tocas? :c 💕
+</button>
+      
+      <div class="message" style="margin-top: 2rem;">
+          Besitos :c ❤️
+      </div>
+  </div>
+
+  <!-- 🔗 Enlazar tu archivo JS al final del body -->
+  <script src="script.js"></script>
 </body>
 </html>
