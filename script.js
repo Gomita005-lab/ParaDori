@@ -242,7 +242,7 @@ const galleryItems = []; // { public_id, resource_type, original_filename, ... }
 // Set con public_id ocultos (solo visual)
 const hiddenIds = new Set(JSON.parse(localStorage.getItem("hiddenIds") || "[]"));
 // tamaño miniaturas
-let thumbSize = parseInt(localStorage.getItem("thumbSize") || "220", 10);
+let thumbSize = parseInt(localStorage.getItem("thumbSize") || "150", 10);
 
 // ======= SELECTORES =======
 const $fileInput = document.getElementById("fileInput");
