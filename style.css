@@ -221,10 +221,10 @@ h2 {
 }
 
 .heart img {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
-    object-fit: cover;
+    object-fit: contain;
     animation: softBounce 2.5s ease-in-out infinite;
     transition: all 0.3s ease;
 }
