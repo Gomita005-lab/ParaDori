@@ -3,117 +3,223 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Una página especial de amor dedicada a Dori, con mensajes, fotos y momentos inolvidables">
   <title>Para mi Dori ❤️</title>
 
-  <!-- 🔗 Vincular tu hoja de estilos -->
+  <!-- 🌸 Vincular estilos -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="stars" id="stars"></div>
-  <div class="floating-hearts" id="floatingHearts"></div>
-  <audio id="bgMusic" loop>
+  <!-- ✨ Fondos y efectos decorativos -->
+  <div class="stars" id="stars" aria-hidden="true"></div>
+  <div class="floating-hearts" id="floatingHearts" aria-hidden="true"></div>
+  
+  <!-- 👨‍💼👩‍⚕️ Iconos de fondo animados -->
+  <div class="background-icons" aria-hidden="true">
+    <div class="icon-pair">
+      <span class="engineer-icon" aria-hidden="true">👨‍💻</span>
+      <span class="nurse-icon" aria-hidden="true">👩‍⚕️</span>
+    </div>
+  </div>
+
+  <!-- 🎵 Música de fondo -->
+  <audio id="bgMusic" loop aria-label="Música de fondo">
     <source src="Amor_del_bueno_Lyrics.mp3" type="audio/mpeg">
-</audio>
-  <div class="music-control" onclick="toggleMusic()" id="musicBtn">🎵</div>
-<div class="modal" id="messageModal">
-    <div class="modal-content">
-        <div class="modal-heart">💖</div>
-        <div class="modal-text" id="modalText"></div>
-        <button class="modal-close" onclick="closeModal()">Aceptar 💕</button>
-    </div>
-</div>
+    Tu navegador no soporta el elemento de audio.
+  </audio>
+  <button class="music-control" id="musicBtn" aria-label="Alternar música de fondo" aria-pressed="false" type="button">
+    🎵
+  </button>
 
-<div class="modal form-modal" id="formModal">
+  <!-- 💌 Modal de mensajes secretos -->
+  <div class="modal" id="messageModal" role="dialog" aria-labelledby="modalText" aria-hidden="true">
     <div class="modal-content">
-        <div id="personSelectStep">
-            <h2 class="modal-title">¿Quién eres? 💕</h2>
-            <div class="person-select">
-                <button class="person-btn" onclick="selectPerson('Gomita')">Gomita 🐻</button>
-                <button class="person-btn" onclick="selectPerson('Dori')">Dori 🐰</button>
-            </div>
-            <button class="modal-close" onclick="closeFormModal()">Cancelar</button>
-        </div>
-        
-        <div id="messageWriteStep" style="display: none;">
-            <h2 class="modal-title" id="writerName"></h2>
-            <p class="modal-subtitle">Escribe tu mensaje de amor 💌</p>
-            <textarea class="message-input" id="messageInput" placeholder="Escribe aquí tu mensaje..."></textarea>
-            <div>
-                <button class="back-btn" onclick="backToPersonSelect()">Atrás</button>
-                <button class="submit-btn" onclick="submitMessage()">Enviar 💕</button>
-            </div>
-        </div>
+      <div class="modal-heart" aria-hidden="true">💖</div>
+      <div class="modal-text" id="modalText" role="status"></div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar mensaje" type="button">
+        Aceptar 💕
+      </button>
     </div>
-</div>
-  <div class="container">
-      <h1>Para mi Dori</h1>
+  </div>
+
+  <!-- 💞 Modal para escribir mensajes -->
+  <div class="modal form-modal" id="formModal" role="dialog" aria-labelledby="formTitle" aria-hidden="true">
+    <div class="modal-content">
+      <!-- Paso 1: Seleccionar persona -->
+      <div id="personSelectStep">
+        <h2 class="modal-title" id="formTitle">¿Quién eres? 💕</h2>
+        <div class="person-select" role="group" aria-label="Selecciona tu identidad">
+          <button class="person-btn" onclick="selectPerson('Gomita')" type="button">
+            Gomita 🐻
+          </button>
+          <button class="person-btn" onclick="selectPerson('Dori')" type="button">
+            Dori 🐰
+          </button>
+        </div>
+        <button class="modal-close" onclick="closeFormModal()" type="button">
+          Cancelar
+        </button>
+      </div>
       
+      <!-- Paso 2: Escribir mensaje -->
+      <div id="messageWriteStep" style="display: none;">
+        <h2 class="modal-title" id="writerName"></h2>
+        <p class="modal-subtitle">Escribe tu mensaje de amor 💌</p>
+        <textarea class="message-input" id="messageInput" placeholder="Escribe aquí tu mensaje..." aria-label="Campo para escribir mensaje"></textarea>
+        <div>
+          <button class="back-btn" onclick="backToPersonSelect()" type="button">
+            Atrás
+          </button>
+          <button class="submit-btn" onclick="submitMessage()" type="button">
+            Enviar 💕
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🌹 Contenido principal -->
+  <main class="container" role="main">
+    <!-- Encabezado principal -->
+    <header>
+      <h1>Para mi Dori ❤️</h1>
+      
+      <!-- Foto principal -->
       <div class="heart">
-        <img src="Juntitos.jpg" width="200" height="200">
-      </div>
-      
-      <div class="flowers">
-          <span class="flower">🌹</span>
-          <span class="flower">🌹</span>
-          <span class="flower">🌹</span>
-      </div>
-      
-      <div class="message">
-<p>Te pienso en cada amanecer y en cada silencio del día.</p>
-<p>Eres mi paz en los días difíciles y mi sonrisa en los días buenos.</p>
-<p>No hay canción ni palabra que pueda decirte cuánto te quiero. 💕</p>
-
+        <img src="Juntitos.jpg" alt="Fotografía de nosotros juntos - momentos especiales compartidos" loading="lazy">
       </div>
 
+      <!-- Flores decorativas -->
+      <div class="flowers" aria-hidden="true">
+        <span class="flower">🌹</span>
+        <span class="flower">🌹</span>
+        <span class="flower">🌹</span>
+      </div>
+
+      <!-- Mensaje principal -->
+      <article class="message">
+        <p>Te pienso en cada amanecer y en cada silencio del día.</p>
+        <p>Eres mi paz en los días difíciles y mi sonrisa en los días buenos.</p>
+        <p>No hay canción ni palabra que pueda decirte cuánto te quiero. 💕</p>
+      </article>
+    </header>
+
+    <!-- Contador de días -->
+    <section aria-labelledby="counterTitle">
       <div class="counter">
-          <h2>Llevamos juntos</h2>
-          <div class="counter-number" id="dayCounter">0</div>
-          <p>días creando momentos inolvidables ❤️</p>
+        <h2 id="counterTitle">Llevamos juntos</h2>
+        <div class="counter-number" id="dayCounter" role="status" aria-live="polite">0</div>
+        <p>días creando momentos inolvidables ❤️</p>
       </div>
+    </section>
 
-      <div class="quote" id="randomQuote">
-          "El amor no se mira, se siente, y aún más cuando ella está junto a ti"
+    <!-- Cita inspiradora -->
+    <blockquote class="quote" id="randomQuote" cite="">
+      "El amor no se mira, se siente, y aún más cuando ella está junto a ti"
+    </blockquote>
+
+    <!-- Sección de mensajes secretos -->
+    <section aria-labelledby="secretMessagesTitle">
+      <h2 id="secretMessagesTitle">Mensajes Secretos 💌</h2>
+      <div class="buttons-grid" role="group" aria-label="Botones para revelar mensajes secretos">
+        <button class="button" type="button" onclick="showMessage(1)">
+          ¿Cuánto te quiero?
+        </button>
+        <button class="button" type="button" onclick="showMessage(2)">
+          Mi día favorito
+        </button>
+        <button class="button" type="button" onclick="showMessage(3)">
+          Lo que admiro
+        </button>
+        <button class="button" type="button" onclick="showMessage(4)">
+          Nuestra canción
+        </button>
+        <button class="button" type="button" onclick="showMessage(5)">
+          Deseo especial
+        </button>
+        <button class="button" type="button" onclick="createConfetti()">
+          ¡Sorpresa! 🎉
+        </button>
       </div>
+    </section>
 
-      <h2>Mensajes Secretos 💌</h2>
-      <div class="buttons-grid">
-          <button class="button" onclick="showMessage(1)">¿Cuánto te quiero?</button>
-          <button class="button" onclick="showMessage(2)">Mi día favorito</button>
-          <button class="button" onclick="showMessage(3)">Lo que admiro</button>
-          <button class="button" onclick="showMessage(4)">Nuestra canción</button>
-          <button class="button" onclick="showMessage(5)">Deseo especial</button>
-          <button class="button" onclick="createConfetti()">¡Sorpresa! 🎉</button>
+    <!-- Sección de razones -->
+    <section aria-labelledby="reasonsTitle">
+      <h2 id="reasonsTitle">Razones por las que te quiero 💖</h2>
+      <div class="reasons-list" role="list">
+        <div class="reason-item" role="listitem">
+          💕 Tu sonrisa ilumina hasta mis días más oscuros
+        </div>
+        <div class="reason-item" role="listitem">
+          ✨ Haces que todo sea más especial
+        </div>
+        <div class="reason-item" role="listitem">
+          🌟 Me haces sentir único e importante
+        </div>
+        <div class="reason-item" role="listitem">
+          💝 Cada momento contigo es un regalo
+        </div>
+        <div class="reason-item" role="listitem">
+          🎈 Tu forma de ser me enamora cada día más
+        </div>
       </div>
+    </section>
 
-      <h2>Razones por las que te quiero 💖</h2>
-      <div class="reasons-list">
-          <div class="reason-item">💕 Tu sonrisa ilumina hasta mis días más oscuros</div>
-          <div class="reason-item">✨ Haces que todo sea más especial</div>
-          <div class="reason-item">🌟 Me haces sentir único e importante</div>
-          <div class="reason-item">💝 Cada momento contigo es un regalo</div>
-          <div class="reason-item">🎈 Tu forma de ser me enamora cada día más</div>
+    <!-- Sección del muro de amor -->
+    <section aria-labelledby="wallTitle">
+      <h2 id="wallTitle">Nuestro Muro de Amor 💌</h2>
+      <button class="button" type="button" onclick="openMessageForm()" style="font-size: 1.2rem; margin-bottom: 2rem; width: 100%; cursor: pointer;">
+        ✍️ Escribir un mensaje
+      </button>
+
+      <div class="messages-wall" id="messagesWall" role="region" aria-label="Muro de mensajes de amor">
+        <p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>
       </div>
+    </section>
 
-<h2>Nuestra Galería 📸</h2>
-<div class="gallery">
-    <div class="gallery-item">💑</div>
-    <div class="gallery-item">🎂</div>
-    <div class="gallery-item">🌅</div>
-    <div class="gallery-item">🎭</div>
-    <div class="gallery-item">🍕</div>
-    <div class="gallery-item">🎮</div>
-</div>
+    <!-- Sección de galería de fotos y videos -->
+    <section class="card" aria-labelledby="galleryUploadTitle">
+      <h2 id="galleryUploadTitle">Fotos o Videos 📷</h2>
+      <div class="row">
+        <input id="fileInput" type="file" accept="image/*,video/*" multiple aria-label="Seleccionar fotos o videos para subir">
+        <button id="uploadBtn" type="button" aria-label="Subir archivos seleccionados">
+          Subir
+        </button>
+        <span id="status" class="muted" role="status" aria-live="polite"></span>
+      </div>
+    </section>
 
-<h2>Nuestro Muro de Amor 💌</h2>
-<button class="button" onclick="openMessageForm()" style="font-size: 1.2rem; margin-bottom: 2rem;">
-    ✍️ Escribir un mensaje
-</button>
+    <!-- Slider de tamaño de miniaturas -->
+    <section class="card" aria-labelledby="sizeSliderTitle">
+      <h2 id="sizeSliderTitle">Ajustar Tamaño</h2>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <label for="sizeSlider" style="font-weight: bold;">Pequeño</label>
+        <input 
+          id="sizeSlider" 
+          type="range" 
+          min="120" 
+          max="420" 
+          value="220"
+          aria-label="Ajustar tamaño de las miniaturas de fotos"
+          style="flex: 1; cursor: pointer;"
+        >
+        <label for="sizeSlider" style="font-weight: bold;">Grande</label>
+      </div>
+      <p style="text-align: center; color: #999; font-size: 0.9rem; margin-top: 0.5rem;">
+        Desliza para cambiar el tamaño de las imágenes
+      </p>
+    </section>
 
-<div class="messages-wall" id="messagesWall">
-    <p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>
-</div>
+    <!-- Galería de fotos y videos -->
+    <section class="card" aria-labelledby="displayGalleryTitle">
+      <h2 id="displayGalleryTitle">Galería 🌈</h2>
+      <div id="gallery" class="grid" role="region" aria-label="Galería de fotos y videos">
+      </div>
+    </section>
+  </main>
 
- <script type="module" src="script.js"></script>
+  <!-- 📜 Script principal -->
+  <script type="module" src="script.js"></script>
+  
 </body>
 </html>
-

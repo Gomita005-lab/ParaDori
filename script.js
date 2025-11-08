@@ -158,7 +158,7 @@ function backToPersonSelect() {
   document.getElementById("messageInput").value = "";
 }
 
-// ✉️ Enviar mensaje
+// Enviar mensaje
 function submitMessage() {
   const messageText = document.getElementById("messageInput").value.trim();
 
@@ -186,30 +186,37 @@ function submitMessage() {
   closeFormModal();
 }
 
-// 💬 Cargar mensajes
+// Slot  de Mensajes
 function loadMessages() {
   const wall = document.getElementById("messagesWall");
 
-  onValue(mensajesRef, (snapshot) => {
-    const data = snapshot.val();
+ onValue(mensajesRef, (snapshot) => {
+  const data = snapshot.val();
+  const wall = document.getElementById("messagesWall");
 
-    if (!data) {
-      wall.innerHTML = '<p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>';
-      return;
-    }
+  if (!data) {
+    wall.innerHTML = '<p style="color: #999; font-style: italic;">Aún no hay mensajes. ¡Sé el primero en escribir! 💕</p>';
+    return;
+  }
 
-    const messages = Object.values(data).sort((a, b) => new Date(b.date) - new Date(a.date));
+  // ✅ Orden correcto: los más antiguos primero
+  const messages = Object.values(data).sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    wall.innerHTML = messages.map(msg => `
-      <div class="message-card">
-        <div class="message-author ${msg.author.toLowerCase()}">${msg.author} 💕</div>
-        <div class="message-text">${msg.text}</div>
-        <div class="message-date">${msg.date}</div>
-      </div>
-    `).join('');
-  }, (error) => {
-    console.error("Error loading messages:", error);
-  });
+  wall.innerHTML = messages.map(msg => `
+    <div class="message-card">
+      <div class="message-author ${msg.author.toLowerCase()}">${msg.author} 💕</div>
+      <div class="message-text">${msg.text}</div>
+      <div class="message-date">${msg.date}</div>
+    </div>
+  `).join('');
+
+  // ✅ Bajar el scroll automáticamente al último mensaje
+  wall.scrollTop = wall.scrollHeight;
+
+}, (error) => {
+  console.error("Error loading messages:", error);
+});
+
 }
 
 // 🪄 Iniciar cuando cargue la página
@@ -224,3 +231,425 @@ window.showMessage = showMessage;
 window.closeModal = closeModal;
 window.createConfetti = createConfetti;
 window.toggleMusic = toggleMusic;
+// SUBIR IMAGENES
+
+// ======= CONFIG =======
+const cloudName = "dp8s3loak";
+const uploadPreset = "imagenes_uploads";
+
+// ======= ESTADO =======
+const galleryItems = []; // { public_id, resource_type, original_filename, ... }
+// Set con public_id ocultos (solo visual)
+const hiddenIds = new Set(JSON.parse(localStorage.getItem("hiddenIds") || "[]"));
+// tamaño miniaturas
+let thumbSize = parseInt(localStorage.getItem("thumbSize") || "220", 10);
+
+// ======= SELECTORES =======
+const $fileInput = document.getElementById("fileInput");
+const $uploadBtn = document.getElementById("uploadBtn");
+const $status = document.getElementById("status");
+const $gallery = document.getElementById("gallery");
+
+// crea slider si no existe en tu HTML
+let $sizeSlider = document.getElementById("sizeSlider");
+if (!$sizeSlider) {
+  $sizeSlider = document.createElement("input");
+  $sizeSlider.type = "range";
+  $sizeSlider.min = "120";
+  $sizeSlider.max = "420";
+  $sizeSlider.value = String(thumbSize);
+  $sizeSlider.id = "sizeSlider";
+  $sizeSlider.style.margin = "12px 0";
+  // lo insertamos antes de la galería (ajústalo a tu layout)
+  ($gallery?.parentElement || document.body).insertBefore($sizeSlider, $gallery);
+}
+
+// ======= HELPERS URL =======
+const cldBase = (rt = "image") => `https://res.cloudinary.com/${cloudName}/${rt}/upload`;
+const viewUrl = (publicId, rt) => `${cldBase(rt)}/f_auto,q_auto,c_fill,w_800/${publicId}`;
+const downloadUrl = (publicId, rt, filename = "archivo") => {
+  const ext = rt === "video" ? ".mp4" : ".jpg";
+  return `${cldBase(rt)}/fl_attachment:${encodeURIComponent(filename + ext)}/${publicId}`;
+};
+
+// ======= SUBIDA =======
+async function uploadToCloudinary(file) {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("upload_preset", uploadPreset);
+  const endpoint = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+  const res = await fetch(endpoint, { method: "POST", body: form });
+  if (!res.ok) throw new Error("Error subiendo a Cloudinary");
+  return res.json();
+}
+
+// ======= PERSISTENCIA =======
+function saveGallery() {
+  try { localStorage.setItem("galleryItems", JSON.stringify(galleryItems)); } catch {}
+}
+function saveHidden() {
+  try { localStorage.setItem("hiddenIds", JSON.stringify([...hiddenIds])); } catch {}
+}
+function saveThumbSize() {
+  try { localStorage.setItem("thumbSize", String(thumbSize)); } catch {}
+}
+function restoreGallery() {
+  const cached = localStorage.getItem("galleryItems");
+  if (!cached) return;
+  try {
+    const parsed = JSON.parse(cached);
+    if (Array.isArray(parsed)) galleryItems.splice(0, galleryItems.length, ...parsed);
+  } catch {}
+}
+
+// ======= RENDER =======
+function renderItem(info) {
+  const { public_id, resource_type, original_filename } = info;
+  const niceName = original_filename || public_id.split("/").pop();
+
+  const $wrap = document.createElement("div");
+  $wrap.className = "item";
+  $wrap.style.setProperty("--thumb", `${thumbSize}px`);
+  if (hiddenIds.has(public_id)) $wrap.classList.add("is-hidden"); // clase opcional
+
+  // Media
+  let $media;
+  if (resource_type === "video") {
+    $media = document.createElement("video");
+    $media.src = viewUrl(public_id, "video");
+    $media.controls = true;
+    $media.playsInline = true;
+    $media.preload = "metadata";
+  } else {
+    $media = document.createElement("img");
+    $media.src = viewUrl(public_id, "image");
+    $media.alt = niceName;
+    $media.loading = "lazy";
+  }
+  $media.className = "item__media";
+
+  // Cuerpo/acciones
+  const $body = document.createElement("div");
+  $body.className = "item__body";
+
+  const $view = document.createElement("a");
+  $view.href = viewUrl(public_id, resource_type);
+  $view.target = "_blank";
+  $view.rel = "noopener";
+  $view.textContent = "Ver";
+
+  const $download = document.createElement("a");
+  $download.href = downloadUrl(public_id, resource_type, niceName);
+
+
+  // Botón ocultar/mostrar (solo visual)
+  const $toggle = document.createElement("button");
+  $toggle.type = "button";
+  const applyLabel = () => $toggle.textContent = hiddenIds.has(public_id) ? "Mostrar" : "Ocultar";
+  applyLabel();
+  $toggle.addEventListener("click", () => {
+    if (hiddenIds.has(public_id)) hiddenIds.delete(public_id);
+    else hiddenIds.add(public_id);
+    saveHidden();
+    renderGallery(); // re-render para aplicar filtro
+  });
+
+  $body.append($view, $download, $toggle);
+  $wrap.append($media, $body);
+  return $wrap;
+}
+
+function renderGallery() {
+  // aplicamos tamaño global
+  document.documentElement.style.setProperty("--thumb", `${thumbSize}px`);
+
+  $gallery.innerHTML = "";
+  for (const item of galleryItems) {
+    // si está oculto, no lo pintamos (eliminación visual)
+    if (hiddenIds.has(item.public_id)) continue;
+    $gallery.prepend(renderItem(item));
+  }
+}
+
+// ======= EVENTOS =======
+document.addEventListener("DOMContentLoaded", () => {
+  restoreGallery();
+  renderGallery();
+});
+
+$sizeSlider.addEventListener("input", (e) => {
+  thumbSize = parseInt(e.target.value, 10);
+  saveThumbSize();
+  renderGallery();
+});
+
+$uploadBtn.addEventListener("click", async () => {
+  const files = Array.from($fileInput.files || []);
+  if (!files.length) {
+    $status.textContent = "Elige uno o más archivos.";
+    return;
+  }
+
+  $uploadBtn.disabled = true;
+  $status.textContent = "Subiendo...";
+
+  try {
+    for (const f of files) {
+      const info = await uploadToCloudinary(f);
+
+      const exists = galleryItems.some(it => it.public_id === info.public_id);
+      if (!exists) {
+        galleryItems.push({
+          public_id: info.public_id,
+          resource_type: info.resource_type,
+          original_filename: info.original_filename
+        });
+      }
+
+      saveGallery();
+    }
+    renderGallery();
+    $status.textContent = "¡Listo!";
+  } catch (err) {
+    console.error(err);
+    $status.textContent = "Error en la subida.";
+  } finally {
+    $uploadBtn.disabled = false;
+  }
+});
+// 🎯 FUNCIONES ADICIONALES - NO SE MODIFICAN LAS TUYAS
+
+// 💾 Guardar mensajes en localStorage (NUEVA)
+function saveMessagesToLocalStorage() {
+  const wall = document.getElementById('messagesWall');
+  const messages = [];
+  
+  wall.querySelectorAll('.message-card').forEach(card => {
+    messages.push({
+      author: card.querySelector('.message-card-author').textContent,
+      text: card.querySelector('.message-card-text').textContent,
+      date: card.querySelector('.message-card-date').textContent
+    });
+  });
+  
+  try {
+    localStorage.setItem('doriMessages', JSON.stringify(messages));
+  } catch (e) {
+    console.log('No se pudo guardar en localStorage');
+  }
+}
+
+// 📂 Cargar mensajes desde localStorage (NUEVA)
+function loadMessagesFromLocalStorage() {
+  try {
+    const stored = localStorage.getItem('doriMessages');
+    if (stored) {
+      const messages = JSON.parse(stored);
+      const wall = document.getElementById('messagesWall');
+      
+      const emptyMsg = wall.querySelector('p');
+      if (emptyMsg) emptyMsg.remove();
+      
+      messages.forEach(msg => {
+        const card = document.createElement('div');
+        card.className = 'message-card';
+        card.innerHTML = `
+          <div class="message-card-author">${msg.author}</div>
+          <div class="message-card-text">${msg.text}</div>
+          <div class="message-card-date">${msg.date}</div>
+        `;
+        wall.appendChild(card);
+      });
+    }
+  } catch (e) {
+    console.log('No se pudo cargar mensajes');
+  }
+}
+
+// 📝 Hook para guardar al enviar mensaje (NUEVA)
+const originalSubmitMessage = submitMessage;
+window.submitMessage = function() {
+  originalSubmitMessage.apply(this, arguments);
+  setTimeout(() => saveMessagesToLocalStorage(), 100);
+}
+
+// 🎊 Efecto de confetti mejorado (ADICIONAL)
+function addConfettiEffect() {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// 🌟 Crear estrellas con efecto de parpadeo suave (MEJORA)
+function enhanceStars() {
+  const stars = document.querySelectorAll('.star');
+  stars.forEach((star, index) => {
+    star.style.animationDelay = (Math.random() * 3) + 's';
+    star.style.animationDuration = (2 + Math.random() * 2) + 's';
+  });
+}
+
+// 💓 Mejorar corazones flotantes (MEJORA)
+function enhanceFloatingHearts() {
+  const heartsContainer = document.getElementById('floatingHearts');
+  if (heartsContainer.children.length > 20) {
+    heartsContainer.innerHTML = '';
+  }
+}
+
+// 🔔 Notificación visual cuando se envía mensaje (NUEVA)
+function showMessageNotification() {
+  const notification = document.createElement('div');
+  notification.textContent = '✅ ¡Mensaje enviado con amor! 💕';
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff6b9d, #c06c84);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    z-index: 999;
+    animation: slideUp 0.4s ease;
+  `;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+// Hook en submitMessage para mostrar notificación (NUEVA)
+const originalClose = closeFormModal;
+window.closeFormModal = function() {
+  originalClose.apply(this, arguments);
+  if (document.getElementById('messageWriteStep').style.display === 'none') {
+    showMessageNotification();
+  }
+}
+
+// 🎵 Mejora en el control de música (ADICIONAL)
+function enhanceMusicControl() {
+  const musicBtn = document.getElementById('musicBtn');
+  const bgMusic = document.getElementById('bgMusic');
+  
+  bgMusic.addEventListener('play', () => {
+    musicBtn.style.opacity = '1';
+  });
+  
+  bgMusic.addEventListener('pause', () => {
+    musicBtn.style.opacity = '0.6';
+  });
+}
+
+// 🖼️ Visor expandido mejorado de galería (NUEVA)
+function enhanceGalleryViewer() {
+  const gallery = document.getElementById('gallery');
+  
+  gallery.addEventListener('click', (e) => {
+    if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+      const viewer = document.createElement('div');
+      viewer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        animation: fadeIn 0.3s ease;
+      `;
+      
+      const media = e.target.cloneNode(true);
+      media.style.cssText = `
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 8px;
+      `;
+      
+      if (media.tagName === 'VIDEO') {
+        media.controls = true;
+      }
+      
+      const closeBtn = document.createElement('button');
+      closeBtn.innerHTML = '✕';
+      closeBtn.style.cssText = `
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        z-index: 2001;
+      `;
+      
+      closeBtn.addEventListener('click', () => viewer.remove());
+      viewer.addEventListener('click', (e) => {
+        if (e.target === viewer) viewer.remove();
+      });
+      
+      viewer.appendChild(media);
+      viewer.appendChild(closeBtn);
+      document.body.appendChild(viewer);
+    }
+  });
+}
+
+// 📱 Detectar si es móvil (NUEVA)
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// ⌨️ Atajos de teclado (NUEVA)
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // ESC para cerrar modales
+    if (e.key === 'Escape') {
+      document.getElementById('messageModal').style.display = 'none';
+      document.getElementById('formModal').style.display = 'none';
+    }
+    
+    // M para toggle música
+    if (e.ctrlKey && e.key === 'm') {
+      e.preventDefault();
+      toggleMusic();
+    }
+  });
+}
+
+// 🚀 Inicialización de mejoras (NUEVA)
+function initializeEnhancements() {
+  addConfettiEffect();
+  enhanceStars();
+  enhanceMusicControl();
+  enhanceGalleryViewer();
+  setupKeyboardShortcuts();
+  loadMessagesFromLocalStorage();
+  
+  if (isMobileDevice()) {
+    document.body.style.fontSize = '16px'; // Prevenir zoom en móvil
+  }
+}
+
+// Ejecutar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+  // Esperar un poco para que se carguen las funciones originales
+  setTimeout(initializeEnhancements, 500);
+});
